@@ -1,57 +1,43 @@
 using System;
 
 public class BinomialCoefficients {
-	private int[] _factorials;
-	private int[] _inverseFactorials;
-	private int _modulo;
-	private int _maxValue;
+	const int MAX = 1000000007;
 	
-	public BinomialCoefficients(int modulo, int maxValue) {
-		_modulo = modulo;
-		_maxValue = maxValue;
-		_factorials = new int[maxValue + 1];
-		_inverseFactorials = new int[maxValue + 1];
-		
-		Generate();		
+	static int add(int a, int b){
+		return (a + b) % MAX;
 	}
 	
-	public int C(int n, int k) {
-		if (n < k) {
-			return 0;
-		} else {
-			return Mul(_factorials[n], Mul(_inverseFactorials[k], _inverseFactorials[n - k]));
-		}
+	static int mul(int a, int b){
+		return (int)(((long)a * b) % MAX);
 	}
 	
-	private void Generate() {
-		_factorials[0] = _inverseFactorials[0] = 1;
-		for (int i = 1; i <= _maxValue; i++) {
-			_factorials[i] = Mul(_factorials[i-1], i);
-			_inverseFactorials[i] = InverseMod(_factorials[i]);
-		}
-	}
-	
-	private int Add(int a, int b) {
-		return (a + b) % _modulo;
-	}
-	
-	private int Mul(int a, int b) {
-		return (int)(((long)a * b) % _modulo);
-	}
-	
-	private int PowerMod(int a, int b) {
+	static int powMod(int a, int b){
 		int res = 1;
-		for (; b > 0; b /= 2) {
-			if (b % 2 == 1) {
-				res = Mul(res, a);
-			}
-			a = Mul(a, a);
+		for (; b > 0; b >>= 1){
+			if ((b & 1) > 0) res = mul(res, a);
+			a = mul(a, a);
 		}
 		return res;
 	}
 	
-	private int InverseMod(int a) {
-		return PowerMod(a, _modulo - 2);
+	static int modInverse(int a){
+		return powMod(a, MAX - 2);
+	}
+	
+	static int fact(int n) {
+		if (n <= 1) {
+			return 1;
+		} else {
+			return mul(n, fact(n-1));
+		}
+	}
+	
+	static int invfact(int n) {
+		return modInverse(fact(n));
+	}
+	
+	static int C(int n, int k){
+		return n < k ? 0 : mul(fact(n), mul(invfact(k), invfact(n-k)));
 	}
 }
 		
